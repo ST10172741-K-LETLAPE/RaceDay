@@ -1,0 +1,24 @@
+@{
+    ViewData["Title"]="Event Details";
+    var doc = Model as System.Text.Json.JsonDocument;
+    var weather = ViewBag.Weather as System.Text.Json.JsonDocument;
+}
+@if(doc != null){
+  var ev = doc.RootElement;
+  <h2>@ev.GetProperty("title").GetString()</h2>
+  <p>@ev.GetProperty("description").GetString()</p>
+  <p><b>Location:</b> @ev.GetProperty("location").GetString() | <b>Date:</b> @ev.GetProperty("eventDate").GetDateTime().ToString("yyyy-MM-dd")</p>
+  @if(ev.TryGetProperty("bannerUrl", out var banner)){
+    <img src="@banner.GetString()" style="max-width:400px" class="img-fluid mb-3" />
+  }
+  <h4>Categories</h4>
+  <p>To enrol, Participant will click Enrol on a category (requires login)</p>
+  @if(ev.TryGetProperty("categories", out var cats)){
+    foreach(var cat in cats.EnumerateArray()){
+      <div class="card mb-2"><div class="card-body d-flex justify-content-between">
+        <span>@cat.GetProperty("categoryName").GetString() - @cat.GetProperty("distanceKm").GetDouble() km</span>
+        <a href="/Events/Enrol/@cat.GetProperty("categoryId").GetInt32()" class="btn btn-sm btn-success">Enrol</a>
+      </div></div>
+    }
+  }
+}

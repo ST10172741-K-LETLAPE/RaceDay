@@ -1,0 +1,30 @@
+@{
+    ViewData["Title"]="Home";
+    var eventsDoc = ViewBag.Events as System.Text.Json.JsonDocument;
+}
+<div class="p-5 bg-light rounded-3 mb-4">
+  <h1 class="display-5 fw-bold">RaceDay Platform 🏁</h1>
+  <p>Upcoming running, walking & cycling events</p>
+  @if(Context.Session.GetString("role")=="Organizer"){
+    <a href="/Dashboard/Dashboard" class="btn btn-primary">Organizer Dashboard</a>
+    <a href="/Events/Create" class="btn btn-outline-dark">Create Event</a>
+  }
+</div>
+
+<div class="row">
+@if(eventsDoc != null){
+  foreach(var ev in eventsDoc.RootElement.EnumerateArray()){
+    <div class="col-md-4 mb-3">
+      <div class="card">
+        <div class="card-body">
+          <h5>@ev.GetProperty("title").GetString()</h5>
+          <p>@ev.GetProperty("location").GetString() - @ev.GetProperty("eventDate").GetDateTime().ToString("yyyy-MM-dd")</p>
+          <a href="/Events/Details/@ev.GetProperty("eventId").GetInt32()" class="btn btn-sm btn-primary">View</a>
+        </div>
+      </div>
+    </div>
+  }
+} else {
+  <p>No events yet. Create one!</p>
+}
+</div>

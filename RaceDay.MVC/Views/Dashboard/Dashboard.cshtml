@@ -1,0 +1,27 @@
+@{
+    ViewData["Title"] = "Organizer Dashboard";
+    var eventsDoc = Model as System.Text.Json.JsonDocument;
+}
+<h2>Organizer Dashboard 🏁</h2>
+<p class="text-muted">Summary of your events, total enrolments, upcoming dates</p>
+<a href="/Events/Create" class="btn btn-primary mb-3">+ Create Event</a>
+
+@if(eventsDoc == null)
+{
+    <div class="alert alert-info">No events yet. Create your first event! This page loaded successfully - no more 500 error.</div>
+}
+else
+{
+    <div class="row">
+    @foreach(var ev in eventsDoc.RootElement.EnumerateArray())
+    {
+        <div class="col-md-6 mb-3">
+          <div class="card">
+            <div class="card-body">
+              <small><code>@ev.ToString().Substring(0, Math.Min(200, ev.ToString().Length))...</code></small>
+            </div>
+          </div>
+        </div>
+    }
+    </div>
+}

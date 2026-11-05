@@ -1,0 +1,15 @@
+@{
+    ViewData["Title"]="Events";
+    var doc = Model as System.Text.Json.JsonDocument;
+}
+<h2>All Events</h2>
+<div class="row">
+@if(doc != null){
+  foreach(var ev in doc.RootElement.EnumerateArray()){
+    <div class="col-md-4 mb-3"><div class="card"><div class="card-body">
+      <h5>@ev.GetProperty("title").GetString()</h5>
+      <a href="/Events/Details/@ev.GetProperty("eventId").GetInt32()" class="btn btn-primary btn-sm">Details</a>
+    </div></div></div>
+  }
+}
+</div>

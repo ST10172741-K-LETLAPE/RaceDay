@@ -77,8 +77,11 @@ namespace RaceDay.API.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Description")
-                        .IsRequired()
+                        .HasMaxLength(1000)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("EventDate")
@@ -86,20 +89,20 @@ namespace RaceDay.API.Migrations
 
                     b.Property<string>("Location")
                         .IsRequired()
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("OrganizerId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Title")
                         .IsRequired()
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.HasKey("EventId");
+
+                    b.HasIndex("OrganizerId");
 
                     b.ToTable("Events");
                 });
@@ -160,8 +163,7 @@ namespace RaceDay.API.Migrations
 
                     b.HasKey("ResultId");
 
-                    b.HasIndex("EnrolmentId")
-                        .IsUnique();
+                    b.HasIndex("EnrolmentId");
 
                     b.ToTable("Results");
                 });
@@ -229,7 +231,8 @@ namespace RaceDay.API.Migrations
 
                     b.HasKey("WeatherId");
 
-                    b.HasIndex("EventId");
+                    b.HasIndex("EventId")
+                        .IsUnique();
 
                     b.ToTable("Weathers");
                 });
@@ -264,6 +267,17 @@ namespace RaceDay.API.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("RaceDay.API.Models.Event", b =>
+                {
+                    b.HasOne("RaceDay.API.Models.User", "Organizer")
+                        .WithMany()
+                        .HasForeignKey("OrganizerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Organizer");
+                });
+
             modelBuilder.Entity("RaceDay.API.Models.EventRoute", b =>
                 {
                     b.HasOne("RaceDay.API.Models.Event", "Event")
@@ -278,8 +292,8 @@ namespace RaceDay.API.Migrations
             modelBuilder.Entity("RaceDay.API.Models.Result", b =>
                 {
                     b.HasOne("RaceDay.API.Models.Enrolment", "Enrolment")
-                        .WithOne()
-                        .HasForeignKey("RaceDay.API.Models.Result", "EnrolmentId")
+                        .WithMany()
+                        .HasForeignKey("EnrolmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -289,8 +303,8 @@ namespace RaceDay.API.Migrations
             modelBuilder.Entity("RaceDay.API.Models.Weather", b =>
                 {
                     b.HasOne("RaceDay.API.Models.Event", "Event")
-                        .WithMany("Weather")
-                        .HasForeignKey("EventId")
+                        .WithOne("Weather")
+                        .HasForeignKey("RaceDay.API.Models.Weather", "EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
