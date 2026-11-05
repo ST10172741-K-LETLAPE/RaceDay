@@ -1,24 +1,49 @@
 @{
-    ViewData["Title"]="Event Details";
-    var doc = Model as System.Text.Json.JsonDocument;
-    var weather = ViewBag.Weather as System.Text.Json.JsonDocument;
+    ViewData["Title"] = "Event Details";
+    var ev = Model as System.Text.Json.JsonDocument;
+    var role = Context.Session.GetString("role");
 }
-@if(doc != null){
-  var ev = doc.RootElement;
-  <h2>@ev.GetProperty("title").GetString()</h2>
-  <p>@ev.GetProperty("description").GetString()</p>
-  <p><b>Location:</b> @ev.GetProperty("location").GetString() | <b>Date:</b> @ev.GetProperty("eventDate").GetDateTime().ToString("yyyy-MM-dd")</p>
-  @if(ev.TryGetProperty("bannerUrl", out var banner)){
-    <img src="@banner.GetString()" style="max-width:400px" class="img-fluid mb-3" />
-  }
-  <h4>Categories</h4>
-  <p>To enrol, Participant will click Enrol on a category (requires login)</p>
-  @if(ev.TryGetProperty("categories", out var cats)){
-    foreach(var cat in cats.EnumerateArray()){
-      <div class="card mb-2"><div class="card-body d-flex justify-content-between">
-        <span>@cat.GetProperty("categoryName").GetString() - @cat.GetProperty("distanceKm").GetDouble() km</span>
-        <a href="/Events/Enrol/@cat.GetProperty("categoryId").GetInt32()" class="btn btn-sm btn-success">Enrol</a>
-      </div></div>
+<h2>Event Details</h2>
+
+@if(ev == null)
+{
+  <div class="alert alert-danger">Event not found or API down.</div>
+}
+else
+{
+  var root = ev.RootElement;
+  string title=""; string loc=""; string date=""; string desc=""; string banner=""; string status=""; int id=0;
+  if(root.TryGetProperty("title", out var t) || root.TryGetProperty("Title", out t)) title = t.GetString() ?? "";
+  if(root.TryGetProperty("location", out var l) || root.TryGetProperty("Location", out l)) loc = l.GetString() ?? "";
+  if(root.TryGetProperty("eventDate", out var d) || root.TryGetProperty("EventDate", out d)) { try{ date = d.GetDateTime().ToString("f"); } catch{ date = d.ToString(); } }
+  if(root.TryGetProperty("description", out var de) || root.TryGetProperty("Description", out de)) desc = de.GetString() ?? "";
+  if(root.TryGetProperty("bannerUrl", out var b) || root.TryGetProperty("BannerUrl", out b)) banner = b.GetString() ?? "";
+  if(root.TryGetProperty("status", out var s) || root.TryGetProperty("Status", out s)) status = s.GetString() ?? "";
+  if(root.TryGetProperty("eventId", out var i) || root.TryGetProperty("EventId", out i) || root.TryGetProperty("id", out i)) id = i.GetInt32();
+
+  <div class="card">
+    @if(!string.IsNullOrEmpty(banner)){
+      <img src="@banner" class="card-img-top" style="max-height:400px; object-fit:cover;" />
     }
-  }
+    <div class="card-body">
+      <h3>@title</h3>
+      <p><strong>Location:</strong> @loc</p>
+      <p><strong>Date:</strong> @date</p>
+      <p><strong>Status:</strong> <span class="badge bg-info">@status</span></p>
+      <p><strong>Total Enrolments:</strong> @ViewBag.EnrolmentCount</p>
+      <p>@desc</p>
+      
+      @if(role == "Participant"){
+        <form method="post" action="/Events/Enrol">
+          <input type="hidden" name="eventId" value="@id" />
+          <input type="hidden" name="categoryId" value="1" />
+          <button class="btn btn-success">Enrol in this Event</button>
+        </form>
+      }
+      @if(role == "Organizer"){
+        <a href="/Dashboard/Enrolments?eventId=@id" class="btn btn-primary">View All Enrolments for this Event</a>
+        <a href="/Dashboard/Dashboard" class="btn btn-secondary">Back to Dashboard</a>
+      }
+    </div>
+  </div>
 }

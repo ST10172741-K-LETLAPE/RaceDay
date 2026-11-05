@@ -6,19 +6,38 @@
 <p class="text-muted">Summary of your events, total enrolments, upcoming dates</p>
 <a href="/Events/Create" class="btn btn-primary mb-3">+ Create Event</a>
 
-@if(eventsDoc == null)
+@if(eventsDoc == null || eventsDoc.RootElement.GetArrayLength() == 0)
 {
-    <div class="alert alert-info">No events yet. Create your first event! This page loaded successfully - no more 500 error.</div>
+    <div class="alert alert-info">No events yet. Create your first event!</div>
 }
 else
 {
     <div class="row">
     @foreach(var ev in eventsDoc.RootElement.EnumerateArray())
     {
+        string title = "Untitled"; string loc=""; string date=""; int id=0; string desc=""; string banner=""; string status="";
+        if(ev.TryGetProperty("title", out var t) || ev.TryGetProperty("Title", out t)) title = t.GetString() ?? "Untitled";
+        if(ev.TryGetProperty("location", out var l) || ev.TryGetProperty("Location", out l)) loc = l.GetString() ?? "";
+        if(ev.TryGetProperty("eventDate", out var d) || ev.TryGetProperty("EventDate", out d)) { try{ date = d.GetDateTime().ToString("yyyy-MM-dd HH:mm"); } catch{ date = d.ToString(); } }
+        if(ev.TryGetProperty("eventId", out var i) || ev.TryGetProperty("EventId", out i) || ev.TryGetProperty("id", out i)) id = i.GetInt32();
+        if(ev.TryGetProperty("description", out var de) || ev.TryGetProperty("Description", out de)) desc = de.GetString() ?? "";
+        if(ev.TryGetProperty("bannerUrl", out var b) || ev.TryGetProperty("BannerUrl", out b)) banner = b.GetString() ?? "";
+        if(ev.TryGetProperty("status", out var s) || ev.TryGetProperty("Status", out s)) status = s.GetString() ?? "";
+
         <div class="col-md-6 mb-3">
-          <div class="card">
+          <div class="card h-100">
+            @if(!string.IsNullOrEmpty(banner)){
+              <img src="@banner" class="card-img-top" style="height:200px; object-fit:cover;" />
+            }
             <div class="card-body">
-              <small><code>@ev.ToString().Substring(0, Math.Min(200, ev.ToString().Length))...</code></small>
+              <h5>@title</h5>
+              <p class="text-muted">@loc - @date</p>
+              <p>@desc.Substring(0, Math.Min(100, desc.Length))...</p>
+              <span class="badge bg-primary">@status</span>
+            </div>
+            <div class="card-footer">
+              <a href="/Dashboard/Enrolments?eventId=@id" class="btn btn-sm btn-outline-primary">View Enrolments (0)</a>
+              <a href="/Events/Details/@id" class="btn btn-sm btn-outline-secondary">Details</a>
             </div>
           </div>
         </div>

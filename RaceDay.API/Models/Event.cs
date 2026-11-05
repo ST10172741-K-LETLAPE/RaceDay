@@ -6,26 +6,20 @@ namespace RaceDay.API.Models
     {
         [Key]
         public int EventId { get; set; }
-
-        [Required, MaxLength(200)]
-        public string Title { get; set; } = string.Empty;
-
-        [MaxLength(1000)]
-        public string? Description { get; set; }
-
+        
         [Required]
+        public string Title { get; set; } = "";
+        
+        public string Location { get; set; } = "";
+        
         public DateTime EventDate { get; set; }
-
-        [Required, MaxLength(200)]
-        public string Location { get; set; } = string.Empty;
-
-        public int OrganizerId { get; set; }
-        public User? Organizer { get; set; }
-
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
-
-        public ICollection<Category> Categories { get; set; } = new List<Category>();
-        public EventRoute? EventRoute { get; set; }
-        public Weather? Weather { get; set; }
+        
+        public string Description { get; set; } = "";
+        
+        public string BannerUrl { get; set; } = ""; // For Number 5 Azure Blob
+        
+        public string Status { get; set; } = "Upcoming"; // Upcoming, Published, Draft, Cancelled
+        
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

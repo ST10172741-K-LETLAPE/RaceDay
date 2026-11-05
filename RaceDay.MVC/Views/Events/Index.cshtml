@@ -1,15 +1,49 @@
 @{
-    ViewData["Title"]="Events";
-    var doc = Model as System.Text.Json.JsonDocument;
+    ViewData["Title"] = "All Events";
+    var eventsDoc = Model as System.Text.Json.JsonDocument;
+    var role = Context.Session.GetString("role");
 }
-<h2>All Events</h2>
-<div class="row">
-@if(doc != null){
-  foreach(var ev in doc.RootElement.EnumerateArray()){
-    <div class="col-md-4 mb-3"><div class="card"><div class="card-body">
-      <h5>@ev.GetProperty("title").GetString()</h5>
-      <a href="/Events/Details/@ev.GetProperty("eventId").GetInt32()" class="btn btn-primary btn-sm">Details</a>
-    </div></div></div>
+<h2>All Events 🏃</h2>
+
+@if(eventsDoc == null)
+{
+  <div class="alert alert-warning">No events found. API may be down or no events created yet. <a href="/Events/Create">Create first event</a></div>
+}
+else
+{
+  <div class="row">
+  @foreach(var ev in eventsDoc.RootElement.EnumerateArray())
+  {
+    string title = "Untitled"; string loc=""; string date=""; int id=0; string banner=""; string status="";
+    if(ev.TryGetProperty("title", out var t) || ev.TryGetProperty("Title", out t)) title = t.GetString() ?? "Untitled";
+    if(ev.TryGetProperty("location", out var l) || ev.TryGetProperty("Location", out l)) loc = l.GetString() ?? "";
+    if(ev.TryGetProperty("eventDate", out var d) || ev.TryGetProperty("EventDate", out d)) { try{ date = d.GetDateTime().ToString("yyyy-MM-dd HH:mm"); } catch{ date = d.ToString(); } }
+    if(ev.TryGetProperty("eventId", out var i) || ev.TryGetProperty("EventId", out i) || ev.TryGetProperty("id", out i) || ev.TryGetProperty("Id", out i)) id = i.GetInt32();
+    if(ev.TryGetProperty("bannerUrl", out var b) || ev.TryGetProperty("BannerUrl", out b)) banner = b.GetString() ?? "";
+    if(ev.TryGetProperty("status", out var s) || ev.TryGetProperty("Status", out s)) status = s.GetString() ?? "";
+
+    <div class="col-md-4 mb-3">
+      <div class="card h-100">
+        @if(!string.IsNullOrEmpty(banner)){
+          <img src="@banner" class="card-img-top" style="height:180px; object-fit:cover;" />
+        }
+        <div class="card-body">
+          <h5>@title</h5>
+          <p class="text-muted">@loc<br/>@date</p>
+          <span class="badge bg-primary">@status</span>
+        </div>
+        <div class="card-footer">
+          <a href="/Events/Details/@id" class="btn btn-sm btn-outline-primary">View Details</a>
+          @if(role == "Participant"){
+            <form method="post" action="/Events/Enrol" class="d-inline">
+              <input type="hidden" name="eventId" value="@id" />
+              <input type="hidden" name="categoryId" value="1" />
+              <button class="btn btn-sm btn-success">Enrol</button>
+            </form>
+          }
+        </div>
+      </div>
+    </div>
   }
+  </div>
 }
-</div>
