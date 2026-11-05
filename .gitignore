@@ -1,0 +1,16 @@
+# Build
+bin/
+obj/
+*.db
+*.sqlite
+*.db-shm
+*.db-wal
+
+# IDE
+.vs/
+*.user
+*.suo
+
+# Secrets
+appsettings.Development.json
+secrets.json
