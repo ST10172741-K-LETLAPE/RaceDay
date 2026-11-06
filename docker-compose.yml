@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  api:
+    build:
+      context: .
+      dockerfile: RaceDay.API/Dockerfile
+    container_name: raceday-api
+    ports:
+      - "5131:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+    volumes:
+      - api-data:/app/data
+    networks:
+      - raceday-network
+
+  mvc:
+    build:
+      context: .
+      dockerfile: RaceDay.MVC/Dockerfile
+    container_name: raceday-mvc
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ApiBaseUrl=http://api:8080
+    depends_on:
+      - api
+    networks:
+      - raceday-network
+
+volumes:
+  api-data:
+
+networks:
+  raceday-network:
+    driver: bridge
