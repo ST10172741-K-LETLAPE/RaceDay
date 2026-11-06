@@ -3,11 +3,28 @@
     var eventsDoc = Model as System.Text.Json.JsonDocument;
     var role = Context.Session.GetString("role");
 }
-<h2>All Events 🏃</h2>
+<h2>All Upcoming Events 🏃</h2>
 
-@if(eventsDoc == null)
+<div class="card p-3 mb-3">
+  <form method="get" class="row g-2">
+    <div class="col-md-3"><input type="text" name="search" class="form-control" placeholder="Search location..." /></div>
+    <div class="col-md-2"><input type="date" name="date" class="form-control" /></div>
+    <div class="col-md-2">
+      <select name="status" class="form-select">
+        <option value="">All Status</option>
+        <option value="Upcoming">Upcoming</option>
+        <option value="Published">Published</option>
+        <option value="Completed">Completed</option>
+      </select>
+    </div>
+    <div class="col-md-2"><button class="btn btn-primary w-100">Filter</button></div>
+    <div class="col-md-3"><a href="/Events" class="btn btn-secondary w-100">Clear Filter</a></div>
+  </form>
+</div>
+
+@if(eventsDoc == null || eventsDoc.RootElement.GetArrayLength() == 0)
 {
-  <div class="alert alert-warning">No events found. API may be down or no events created yet. <a href="/Events/Create">Create first event</a></div>
+  <div class="alert alert-warning">No events found. <a href="/Events/Create">Create first event</a></div>
 }
 else
 {
@@ -18,29 +35,20 @@ else
     if(ev.TryGetProperty("title", out var t) || ev.TryGetProperty("Title", out t)) title = t.GetString() ?? "Untitled";
     if(ev.TryGetProperty("location", out var l) || ev.TryGetProperty("Location", out l)) loc = l.GetString() ?? "";
     if(ev.TryGetProperty("eventDate", out var d) || ev.TryGetProperty("EventDate", out d)) { try{ date = d.GetDateTime().ToString("yyyy-MM-dd HH:mm"); } catch{ date = d.ToString(); } }
-    if(ev.TryGetProperty("eventId", out var i) || ev.TryGetProperty("EventId", out i) || ev.TryGetProperty("id", out i) || ev.TryGetProperty("Id", out i)) id = i.GetInt32();
+    if(ev.TryGetProperty("eventId", out var i) || ev.TryGetProperty("EventId", out i) || ev.TryGetProperty("id", out i)) id = i.GetInt32();
     if(ev.TryGetProperty("bannerUrl", out var b) || ev.TryGetProperty("BannerUrl", out b)) banner = b.GetString() ?? "";
     if(ev.TryGetProperty("status", out var s) || ev.TryGetProperty("Status", out s)) status = s.GetString() ?? "";
 
     <div class="col-md-4 mb-3">
       <div class="card h-100">
-        @if(!string.IsNullOrEmpty(banner)){
-          <img src="@banner" class="card-img-top" style="height:180px; object-fit:cover;" />
-        }
+        @if(!string.IsNullOrEmpty(banner)){ <img src="@banner" class="card-img-top" style="height:180px; object-fit:cover;" /> }
         <div class="card-body">
           <h5>@title</h5>
           <p class="text-muted">@loc<br/>@date</p>
           <span class="badge bg-primary">@status</span>
         </div>
         <div class="card-footer">
-          <a href="/Events/Details/@id" class="btn btn-sm btn-outline-primary">View Details</a>
-          @if(role == "Participant"){
-            <form method="post" action="/Events/Enrol" class="d-inline">
-              <input type="hidden" name="eventId" value="@id" />
-              <input type="hidden" name="categoryId" value="1" />
-              <button class="btn btn-sm btn-success">Enrol</button>
-            </form>
-          }
+          <a href="/Events/Details/@id" class="btn btn-sm btn-outline-primary">View Details & Categories</a>
         </div>
       </div>
     </div>

@@ -1,0 +1,29 @@
+@{
+    ViewData["Title"] = "Add Category";
+}
+<h2>Add Category to Event @ViewBag.EventId</h2>
+<p class="text-muted">Add age or distance categories to each event</p>
+
+<form method="post" class="card p-4">
+  <input type="hidden" name="eventId" value="@ViewBag.EventId" />
+  <div class="mb-3">
+    <label class="form-label">Category Name *</label>
+    <input type="text" name="name" class="form-control" required placeholder="e.g. 10K Challenge, 5K Fun Run, Elite" />
+  </div>
+  <div class="row">
+    <div class="col-md-4 mb-3">
+      <label class="form-label">Age Group</label>
+      <input type="text" name="ageGroup" class="form-control" placeholder="e.g. 18-35, 36-50, Open" />
+    </div>
+    <div class="col-md-4 mb-3">
+      <label class="form-label">Distance</label>
+      <input type="text" name="distance" class="form-control" placeholder="e.g. 5K, 10K, 21K, 42K" />
+    </div>
+    <div class="col-md-4 mb-3">
+      <label class="form-label">Max Participants</label>
+      <input type="number" name="maxParticipants" class="form-control" value="500" />
+    </div>
+  </div>
+  <button type="submit" class="btn btn-primary">Add Category</button>
+  <a href="/Categories/Index?eventId=@ViewBag.EventId" class="btn btn-secondary ms-2">Cancel</a>
+</form>

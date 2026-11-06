@@ -1,0 +1,24 @@
+@{
+    ViewData["Title"] = "Categories";
+    var cats = Model as System.Text.Json.JsonDocument;
+}
+<h2>Categories for Event @ViewBag.EventId</h2>
+<a href="/Categories/Create?eventId=@ViewBag.EventId" class="btn btn-primary mb-3">+ Add Category</a>
+
+@if(cats == null)
+{
+  <div class="alert alert-info">No categories yet. Add age or distance categories (e.g. 5K, 10K, 18-35, 36-50)</div>
+}
+else
+{
+  <table class="table table-bordered">
+    <thead><tr><th>Name</th><th>Age Group</th><th>Distance</th><th>Max</th></tr></thead>
+    <tbody>
+    @foreach(var c in cats.RootElement.EnumerateArray())
+    {
+      <tr><td>@c.ToString().Substring(0, Math.Min(100, c.ToString().Length))</td><td>-</td><td>-</td><td>-</td></tr>
+    }
+    </tbody>
+  </table>
+}
+<a href="/Dashboard/Dashboard" class="btn btn-secondary">Back to Dashboard</a>

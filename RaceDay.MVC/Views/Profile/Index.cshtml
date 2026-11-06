@@ -1,0 +1,36 @@
+@{
+    ViewData["Title"] = "My Profile";
+    var profile = Model as System.Text.Json.JsonDocument;
+    var email = Context.Session.GetString("email");
+    var role = Context.Session.GetString("role");
+}
+<h2>My Profile 👤</h2>
+
+<div class="row">
+<div class="col-md-4">
+  <div class="card p-3 text-center">
+    <img src="@(Context.Session.GetString("profilePic") ?? "/uploads/default-profile.png")" class="rounded-circle mx-auto" style="width:120px; height:120px; object-fit:cover;" onerror="this.src='https://via.placeholder.com/120'" />
+    <h5 class="mt-3">@email</h5>
+    <span class="badge bg-primary">@role</span>
+  </div>
+</div>
+<div class="col-md-8">
+  <form method="post" action="/Profile/Update" enctype="multipart/form-data" class="card p-4">
+    <h5>View/Update Personal Info</h5>
+    <div class="mb-3">
+      <label class="form-label">Full Name</label>
+      <input type="text" name="fullName" class="form-control" value="@(profile != null ? profile.RootElement.ToString().Substring(0, Math.Min(50, profile.RootElement.ToString().Length)) : "")" placeholder="Your full name" />
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Email</label>
+      <input type="email" name="email" class="form-control" value="@email" />
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Upload Profile Picture (Azure Blob - Number 5)</label>
+      <input type="file" name="profilePicture" class="form-control" accept="image/*" />
+      <small class="text-muted">Upload via BlobStorageService to Azure Blob or wwwroot/uploads</small>
+    </div>
+    <button type="submit" class="btn btn-primary">Update Profile</button>
+  </form>
+</div>
+</div>

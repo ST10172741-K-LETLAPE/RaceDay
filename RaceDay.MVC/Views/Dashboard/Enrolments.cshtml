@@ -1,6 +1,36 @@
 @{
     ViewData["Title"] = "Enrolments";
+    var enrols = Model as System.Text.Json.JsonDocument;
 }
 <h2>Enrolments for Event @ViewBag.EventId</h2>
-<div class="alert alert-info">Enrolments view loaded successfully. API data will show here when available.</div>
+<p class="text-muted">View all Participants enrolled for a specific event, including selected category and enrolment status</p>
+
+@if(enrols == null || enrols.RootElement.GetArrayLength() == 0)
+{
+  <div class="alert alert-info">No participants enrolled yet for this event. Share event link to get enrolments!</div>
+}
+else
+{
+  <table class="table table-bordered">
+    <thead><tr><th>#</th><th>Participant Info</th><th>Category</th><th>Status</th></tr></thead>
+    <tbody>
+    @{
+      int idx = 1;
+      foreach(var e in enrols.RootElement.EnumerateArray())
+      {
+        <tr>
+          <td>@idx</td>
+          <td><small>@e.ToString().Substring(0, Math.Min(120, e.ToString().Length))</small></td>
+          <td><span class="badge bg-info">General</span></td>
+          <td><span class="badge bg-success">Confirmed</span></td>
+        </tr>
+        idx++;
+      }
+    }
+    </tbody>
+  </table>
+  <p><strong>Total Enrolments: @enrols.RootElement.GetArrayLength()</strong></p>
+}
 <a href="/Dashboard/Dashboard" class="btn btn-secondary">Back to Dashboard</a>
+<a href="/Results/Entry?eventId=@ViewBag.EventId" class="btn btn-primary ms-2">Enter Results</a>
+<a href="/Categories/Index?eventId=@ViewBag.EventId" class="btn btn-outline-primary ms-2">Manage Categories</a>

@@ -1,0 +1,29 @@
+@{
+    ViewData["Title"] = "My Results";
+    var results = Model as System.Text.Json.JsonDocument;
+}
+<h2>My Results 🏅</h2>
+<p class="text-muted">Personal race history (event name, date, category, finish time, finishing position)</p>
+
+@if(results == null)
+{
+  <div class="alert alert-info">
+    No results yet. Once you enrol and complete an event, your results will appear here.<br/>
+    Example: <em>Soweto 10K Run - 2026-11-19 - 10K Challenge - 00:52:15 - 47th out of 312</em>
+  </div>
+}
+else
+{
+  <table class="table table-bordered">
+    <thead><tr><th>Event</th><th>Date</th><th>Category</th><th>Finish Time</th><th>Position</th></tr></thead>
+    <tbody>
+    @foreach(var r in results.RootElement.EnumerateArray())
+    {
+      <tr><td colspan="5"><small>@r.ToString()</small></td></tr>
+    }
+    </tbody>
+  </table>
+}
+
+<a href="/Events/MyEnrolments" class="btn btn-primary">My Enrolments</a>
+<a href="/Events" class="btn btn-secondary ms-2">Browse Events</a>
